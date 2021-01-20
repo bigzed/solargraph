@@ -37,11 +37,14 @@ module Solargraph
 
         dir = File.dirname(filename)
         until File.dirname(dir) == dir
-          Solargraph.logger.error "FileFinder Filename current dir #{dir} #{File.exist?(File.join('dir',
+          Solargraph.logger.error "FileFinder Filename current dir #{dir} #{File.exist?(File.join(dir,
                                                                                                   '.rubocop.yml'))}"
 
           here = File.join(dir, '.rubocop.yml')
-          return here if File.exist?(here)
+          if File.exist?(here)
+            Solargraph.logger.error "Here: #{here}"
+            return here
+          end
 
           dir = File.dirname(dir)
         end
