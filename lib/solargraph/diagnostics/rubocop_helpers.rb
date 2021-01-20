@@ -12,7 +12,7 @@ module Solargraph
       # @param filename [String]
       # @param code [String]
       # @return [Array(Array<String>, Array<String>)]
-      def generate_options filename, code
+      def generate_options(filename, code)
         args = ['-f', 'j']
         rubocop_file = find_rubocop_file(filename)
         args.push('-c', fix_drive_letter(rubocop_file)) unless rubocop_file.nil?
@@ -27,13 +27,22 @@ module Solargraph
       #
       # @param filename [String]
       # @return [String, nil]
-      def find_rubocop_file filename
+      def find_rubocop_file(filename)
+        Solargraph.logger.error "FileFinder Filename: #{filename}"
         return nil unless File.exist?(filename)
+
+        Solargraph.logger.error 'FileFinder Filename found'
         filename = File.realpath(filename)
+        Solargraph.logger.error "FileFinder Filename real path #{filename}"
+
         dir = File.dirname(filename)
         until File.dirname(dir) == dir
+          Solargraph.logger.error "FileFinder Filename current dir #{dir} #{File.exist?(File.join('dir',
+                                                                                                  '.rubocop.yml'))}"
+
           here = File.join(dir, '.rubocop.yml')
           return here if File.exist?(here)
+
           dir = File.dirname(dir)
         end
         nil
@@ -44,8 +53,9 @@ module Solargraph
       #
       # @param path [String]
       # @return [String]
-      def fix_drive_letter path
+      def fix_drive_letter(path)
         return path unless path.match(/^[a-z]:/)
+
         path[0].upcase + path[1..-1]
       end
 
